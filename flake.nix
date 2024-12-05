@@ -14,12 +14,12 @@
       }).extend (self: super: {
         ocamlPackages = super.ocaml-ng.ocamlPackages_5_2;
       }); in
-      let grainhack = pkgs.callPackage ./nix {
+      let lambda-calculus = pkgs.callPackage ./nix {
         inherit nix-filter;
         doCheck = true;
       }; in
       rec {
-        packages = { inherit grainhack; };
-        devShell = import ./nix/shell.nix { inherit pkgs grainhack; };
+        packages = { inherit lambda-calculus; };
+        devShell = import ./nix/shell.nix { inherit pkgs lambda-calculus; };
       });
 }

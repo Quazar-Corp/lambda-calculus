@@ -1,0 +1,11 @@
+node_modules/
+/coverage
+/lib
+/_export
+_esy/
+/_esy
+/_build
+_build/
+/_release
+/_platformrelease
+*.swp
