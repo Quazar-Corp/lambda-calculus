@@ -9,4 +9,6 @@ module Description = struct
     | Function (id, body) -> "λ" ^ id ^ "." ^ (body |> to_string)
     | Application (func, argument) ->
         "(" ^ (func |> to_string) ^ ")" ^ (argument |> to_string)
+
+  let of_string = Lexer.next
 end

@@ -8,3 +8,7 @@ let identity_applied =
 
 let () = Printf.printf "Identity function: %s\n" identity
 let () = Printf.printf "Identity applied to y: %s\n" identity_applied
+
+let () =
+  "." |> of_string |> Lexer.show_alphabet
+  |> Printf.printf "Tokenized Identity: %s\n"
