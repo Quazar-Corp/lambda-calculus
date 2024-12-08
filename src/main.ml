@@ -10,5 +10,9 @@ let () = Printf.printf "Identity function: %s\n" identity
 let () = Printf.printf "Identity applied to y: %s\n" identity_applied
 
 let () =
-  "." |> of_string |> Lexer.show_alphabet
-  |> Printf.printf "Tokenized Identity: %s\n"
+  Printf.printf "Tokenized Identity:\n";
+  "λx.x" |> Lexer.tokenize
+
+let () =
+  Printf.printf "Tokenized Identity Applied:\n";
+  "(λx.x)y" |> Lexer.tokenize
