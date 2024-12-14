@@ -23,12 +23,10 @@ let rec tokenizer buf =
 let buf_from_string = Sedlexing.Latin1.from_string
 
 let tokenize input =
-  let rec loop buf =
+  let rec loop buf lexemes =
     let token = tokenizer buf in
     match token with
-    | EOF -> ()
-    | _ as t ->
-        Printf.printf "%s\n" (show_token t);
-        loop buf
+    | EOF -> lexemes |> List.rev
+    | _ as t -> loop buf (t :: lexemes)
   in
-  loop (input |> buf_from_string)
+  loop (input |> buf_from_string) []
