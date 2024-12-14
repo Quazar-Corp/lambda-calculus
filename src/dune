@@ -1,6 +1,19 @@
+(library
+ (name lexical)
+ (libraries menhirLib)
+ (modules
+  (:standard \ Main))
+ (preprocess
+  (pps ppx_deriving.show sedlex.ppx)))
+
+(menhir
+ (modules parser)
+ (flags --dump --explain --table))
+
 (executable
  (name main)
  (public_name lambdac)
- (libraries alcotest)
+ (modules Main)
+ (libraries lexical)
  (preprocess
-  (pps ppx_deriving.show sedlex.ppx)))
+  (pps ppx_deriving.show)))

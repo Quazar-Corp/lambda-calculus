@@ -1,3 +1,4 @@
+open Parser
 open Sedlexing.Utf8
 
 type token = VAR of string | LAMBDA | DOT | LEFT_PARENS | RIGHT_PARENS | EOF
@@ -7,7 +8,7 @@ exception Lexer_error
 
 let whitespace = [%sedlex.regexp? Plus (' ' | '\t' | '\n')]
 let variable = [%sedlex.regexp? 'a' .. 'z' | 'A' .. 'Z']
-let lambda = [%sedlex.regexp? "λ" | "0x03BB" | "0xCE 0xBB"]
+let lambda = [%sedlex.regexp? "λ" | "0x03BB" | "0xCE 0xBB" | "\\"]
 
 let rec tokenizer buf =
   match%sedlex buf with
