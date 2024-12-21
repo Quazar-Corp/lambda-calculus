@@ -1,20 +1,16 @@
-open Formal.Description
+open Frontend.Lexer
+open Core
 
-let () = print_endline "Hello, Lambda Calculus"
-let identity = Function ("x", Name "x") |> to_string
+let extension = ".lambda"
+let check_extension filename = Filename.check_suffix filename extension
 
-let identity_applied =
-  Application (Function ("x", Name "x"), Name "y") |> to_string
+let main args =
+  let filename = args.(1) in
+  if filename |> check_extension then
+    let input = In_channel.read_all filename in
+    parse input
+  else
+    Printf.eprintf
+      "Invalid file! Please provide a valid lambda calculus file (.lambda)\n"
 
-let () = Printf.printf "Identity function: %s\n" identity
-let () = Printf.printf "Identity applied to y: %s\n" identity_applied
-
-let () =
-  Printf.printf "Tokenized Identity:\n";
-  "λx.x" |> Lexer.tokenize
-  |> List.iter (fun l -> Printf.printf "LEXEME: %s\n" (Lexer.show_token l))
-
-let () =
-  Printf.printf "Tokenized Identity Applied:\n";
-  "(λx.x)y" |> Lexer.tokenize
-  |> List.iter (fun l -> Printf.printf "LEXEME: %s\n" (Lexer.show_token l))
+let () = Sys.get_argv () |> main

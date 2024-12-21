@@ -1,6 +1,19 @@
-(executable
- (name main)
- (public_name lambdac)
- (libraries alcotest)
+(library
+ (name frontend)
+ (libraries menhirLib)
+ (modules
+  (:standard \ Main))
  (preprocess
   (pps ppx_deriving.show sedlex.ppx)))
+
+(menhir
+ (modules parser)
+ (flags --dump --explain --table))
+
+(executable
+ (name main)
+ (public_name compiler)
+ (modules Main)
+ (libraries frontend core)
+ (preprocess
+  (pps ppx_deriving.show)))
