@@ -1,5 +1,5 @@
 (library
- (name lexical)
+ (name frontend)
  (libraries menhirLib)
  (modules
   (:standard \ Main))
@@ -12,8 +12,8 @@
 
 (executable
  (name main)
- (public_name lambdac)
+ (public_name compiler)
  (modules Main)
- (libraries lexical)
+ (libraries frontend core)
  (preprocess
   (pps ppx_deriving.show)))
