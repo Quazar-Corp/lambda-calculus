@@ -11,6 +11,7 @@ let () =
   | _ -> None
 
 let whitespace = [%sedlex.regexp? Plus (' ' | '\t' | '\n')]
+let number = [%sedlex.regexp? Plus '0' .. '9']
 let alphabet = [%sedlex.regexp? 'a' .. 'z' | 'A' .. 'Z']
 let variable = [%sedlex.regexp? alphabet | Star alphabet]
 let lambda = [%sedlex.regexp? "λ" | "0x03BB" | "0xCE 0xBB" | "\\"]
@@ -18,6 +19,10 @@ let lambda = [%sedlex.regexp? "λ" | "0x03BB" | "0xCE 0xBB" | "\\"]
 let rec tokenizer buf =
   match%sedlex buf with
   | whitespace -> tokenizer buf
+  | number ->
+      let literal = lexeme buf in
+      let num = int_of_string literal in
+      INT num
   | lambda -> LAMBDA
   | '.' -> DOT
   | '(' -> LEFT_PARENS
@@ -49,7 +54,11 @@ let rec loop lexbuf state =
   | Shifting _ | AboutToReduce _ ->
       let state = resume state in
       loop lexbuf state
-  | HandlingError _env -> raise Parser_error
+  | HandlingError _env ->
+      let start = Sedlexing.lexing_position_start lexbuf in
+      Printf.printf "Error at: %d-%d\n" start.Lexing.pos_lnum
+        start.Lexing.pos_cnum;
+      raise Parser_error
   | Accepted matched -> matched
   | Rejected -> failwith "Rejected"
 
