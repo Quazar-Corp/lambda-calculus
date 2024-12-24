@@ -32,6 +32,10 @@ let rec tokenizer buf =
   | '.' -> DOT
   | '(' -> LEFT_PARENS
   | ')' -> RIGHT_PARENS
+  | '+' -> PLUS
+  | '-' -> MINUS
+  | '/' -> DIVIDE
+  | '*' -> MULT
   | variable -> VAR (lexeme buf)
   | eof -> EOF
   | _ -> raise @@ Lexer_error
