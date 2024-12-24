@@ -12,6 +12,7 @@ let () =
 
 let whitespace = [%sedlex.regexp? Plus (' ' | '\t' | '\n')]
 let number = [%sedlex.regexp? Plus '0' .. '9']
+let boolean = [%sedlex.regexp? "true" | "false"]
 let alphabet = [%sedlex.regexp? 'a' .. 'z' | 'A' .. 'Z']
 let variable = [%sedlex.regexp? alphabet | Star alphabet]
 let lambda = [%sedlex.regexp? "λ" | "0x03BB" | "0xCE 0xBB" | "\\"]
@@ -23,6 +24,10 @@ let rec tokenizer buf =
       let literal = lexeme buf in
       let num = int_of_string literal in
       INT num
+  | boolean ->
+      let literal = lexeme buf in
+      let boolean = bool_of_string literal in
+      BOOL boolean
   | lambda -> LAMBDA
   | '.' -> DOT
   | '(' -> LEFT_PARENS
