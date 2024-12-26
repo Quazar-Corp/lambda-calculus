@@ -1,4 +1,5 @@
 exception Type_error
+exception Application_error of string
 
 type expression =
   | Name of string
