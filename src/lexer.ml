@@ -14,28 +14,16 @@ let whitespace = [%sedlex.regexp? Plus (' ' | '\t' | '\n')]
 let number = [%sedlex.regexp? Plus '0' .. '9']
 let boolean = [%sedlex.regexp? "true" | "false"]
 let alphabet = [%sedlex.regexp? 'a' .. 'z' | 'A' .. 'Z']
-let variable = [%sedlex.regexp? alphabet | Star alphabet]
+let variable = [%sedlex.regexp? alphabet, Star alphabet, Star number | number]
 let lambda = [%sedlex.regexp? "λ" | "0x03BB" | "0xCE 0xBB" | "\\"]
 
 let rec tokenizer buf =
   match%sedlex buf with
   | whitespace -> tokenizer buf
-  | number ->
-      let literal = lexeme buf in
-      let num = int_of_string literal in
-      INT num
-  | boolean ->
-      let literal = lexeme buf in
-      let boolean = bool_of_string literal in
-      BOOL boolean
   | lambda -> LAMBDA
   | '.' -> DOT
   | '(' -> LEFT_PARENS
   | ')' -> RIGHT_PARENS
-  | '+' -> PLUS
-  | '-' -> MINUS
-  | '/' -> DIVIDE
-  | '*' -> MULT
   | variable -> VAR (lexeme buf)
   | eof -> EOF
   | _ -> raise @@ Lexer_error

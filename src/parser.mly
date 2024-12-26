@@ -1,14 +1,12 @@
 %{
+open Semantic
 %}
 
 %token <string> VAR
-%token <int> INT
-%token <bool> BOOL
 %token LAMBDA
 %token DOT
 %token LEFT_PARENS 
 %token RIGHT_PARENS
-%token PLUS MINUS DIVIDE MULT
 
 %token EOF
 
@@ -16,29 +14,26 @@
 
 %%
 
-program : expr_lst = expression_list; EOF { Printf.printf "%s" expr_lst }
+program : expr_lst = expression_list; EOF 
+  { expr_lst 
+    |> List.iter (fun expr -> 
+        print_lambda expr (beta_reduce expr)) }
 
-name : var  = VAR { var }
-     | int_ = INT { int_ |> string_of_int }
-     | bool_ = BOOL { bool_ |> string_of_bool }
+name : var  = VAR { Name var }
 
-arithmetic_operator : MULT { * }  
-                    | DIVIDE { / } 
-                    | PLUS { + }
-                    | MINUS { - }
+func : LAMBDA; n = name; DOT; expr = expression 
+                                { match n with 
+                                  | Name name -> Function (name, expr)
+                                  | _ -> raise Type_error }
 
-arithmetic : n = name { n }
-           | n = name; op = arithmetic_operator; ar = arithmetic { (op (int_of_string n) (int_of_string ar)) |> string_of_int } 
-
-func : LAMBDA; n = name; DOT; expr = arithmetic { "lambda " ^ n ^ " -> " ^ expr }
-
-application : LEFT_PARENS; f = func; RIGHT_PARENS; expr = expression { "(" ^ f ^ ")" ^ expr }
+application : LEFT_PARENS; expr1 = expression; RIGHT_PARENS; expr2 = expression { Application (expr1, expr2) }
+            | LEFT_PARENS; expr1 = expression; RIGHT_PARENS; LEFT_PARENS; expr2 = expression ; RIGHT_PARENS { Application (expr1, expr2) }
 
 expression : 
   | n = name { n } 
   | f = func { f }
   | a = application { a } 
 
-expression_list : expr = expression { Printf.sprintf "Output: %s\n" expr }
-                | expr = expression; expr_lst = expression_list { Printf.sprintf "Output: %s\n%s" expr expr_lst  }
+expression_list : expr = expression { [ expr ] }
+                | expr = expression; expr_lst = expression_list { expr :: expr_lst }
 
