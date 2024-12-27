@@ -1,6 +1,6 @@
 (library
  (name frontend)
- (libraries menhirLib)
+ (libraries str menhirLib)
  (modules
   (:standard \ Main))
  (preprocess

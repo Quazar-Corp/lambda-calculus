@@ -1,43 +1,46 @@
 exception Type_error
-exception Application_error of string
 
 type expression =
   | Name of string
-  | Function of string * expression
+  | Abstraction of string * expression
   | Application of expression * expression
+[@@deriving show]
 
 let rec lambda_to_string = function
   | Name var -> var
-  | Function (param, body) ->
+  | Abstraction (param, body) ->
       Printf.sprintf "λ%s -> %s" param (lambda_to_string body)
+  | Application (func, Name argument) ->
+      Printf.sprintf "(%s)%s" (func |> lambda_to_string) argument
   | Application (func, argument) ->
       Printf.sprintf "(%s)(%s)" (lambda_to_string func)
         (lambda_to_string argument)
 
 let rec substitute expr variable replacement =
   match expr with
-  | Name variable' -> if variable = variable' then replacement else expr
-  | Function (var, expr') ->
-      if var = variable then expr
-      else
-        let expr' = substitute expr' variable replacement in
-        Function (var, expr')
+  | Name var -> if var = variable then replacement else expr
+  | Abstraction (param, body) ->
+      if param = variable then expr
+      else Abstraction (param, substitute body variable replacement)
   | Application (func, argument) ->
-      let func' = substitute func variable replacement in
-      let argument' = substitute argument variable replacement in
-      Application (func', argument')
+      Application
+        ( substitute func variable replacement,
+          substitute argument variable replacement )
 
 let rec beta_reduce (expr : expression) =
   match expr with
   | Name _ as var -> var
-  | Function (_, _) as func -> func
-  | Application (func, argument) -> (
-      let reduced_left = beta_reduce func in
+  | Abstraction (_, _) as func -> func
+  | Application (Abstraction (param, body), rexpr) ->
+      let reduced_body = substitute body param rexpr in
+      beta_reduce reduced_body
+  | Application (lexpr, rexpr) -> (
+      let reduced_left = beta_reduce lexpr in
       match reduced_left with
-      | Function (param, body) ->
-          let applied = substitute body param argument in
+      | Abstraction (param, body) ->
+          let applied = substitute body param rexpr in
           beta_reduce applied
-      | _ -> Application (reduced_left, beta_reduce argument))
+      | _ -> Application (reduced_left, beta_reduce rexpr))
 
 let print_lambda lambda result =
   let showable_lambda = lambda |> lambda_to_string in

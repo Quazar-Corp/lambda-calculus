@@ -3,7 +3,7 @@ open Semantic
 %}
 
 %token <string> VAR
-%token NEWLINE LAMBDA
+%token LAMBDA
 %token DOT
 %token LEFT_PARENS 
 %token RIGHT_PARENS
@@ -17,25 +17,25 @@ open Semantic
 program : expr_lst = expression_list; EOF 
   { expr_lst 
     |> List.iter (fun expr -> 
+        expr |> show_expression |> Printf.printf "RAW: %s\n";
         print_lambda expr (beta_reduce expr)) }
 
 name : var  = VAR { Name var }
 
-func : 
+abstraction : 
   LAMBDA; n = name; DOT; expr = expression 
     { match n with 
-      | Name name -> Function (name, expr)
+      | Name name -> Abstraction (name, expr)
       | _ -> raise Type_error }
 
 application : 
-  LEFT_PARENS; expr1 = expression; RIGHT_PARENS; LEFT_PARENS; expr2 = expression; RIGHT_PARENS 
-    { Application (expr1, expr2) }
-  | LEFT_PARENS; expr1 = expression; RIGHT_PARENS; expr2 = expression { Application (expr1, expr2) }
+  lexpr = expression; rexpr = expression { Application (lexpr, rexpr) } 
 
 expression : 
-  | n = name { n } 
-  | f = func { f }
-  | a = application { a } 
+  | n   = name        { n } 
+  | abs = abstraction { abs }
+  | LEFT_PARENS expr = expression RIGHT_PARENS { expr }
+  | a   = application { a } 
 
 expression_list : 
   | expr = expression { [ expr ] }
