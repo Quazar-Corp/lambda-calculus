@@ -17,22 +17,21 @@ open Semantic
 program : expr_lst = expression_list; EOF 
   { expr_lst 
     |> List.iter (fun expr -> 
-        expr |> show_expression |> Printf.printf "RAW: %s\n";
-        print_lambda expr (beta_reduce expr)) }
+        print_lambda expr (expr |> eval [])) }
 
-name : var  = VAR { Name var }
+variable : var  = VAR { Variable var }
 
 abstraction : 
-  LAMBDA; n = name; DOT; expr = expression 
-    { match n with 
-      | Name name -> Abstraction (name, expr)
+  LAMBDA; v = variable; DOT; expr = expression 
+    { match v with 
+      | Variable var -> Abstraction (var, expr)
       | _ -> raise Type_error }
 
 application : 
   lexpr = expression; rexpr = expression { Application (lexpr, rexpr) } 
 
 expression : 
-  | n   = name        { n } 
+  | v   = variable    { v } 
   | abs = abstraction { abs }
   | LEFT_PARENS expr = expression RIGHT_PARENS { expr }
   | a   = application { a } 

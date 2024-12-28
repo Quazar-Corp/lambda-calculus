@@ -12,7 +12,7 @@
 
 (executable
  (name main)
- (public_name compiler)
+ (public_name interpreter)
  (modules Main)
  (libraries frontend core)
  (preprocess
