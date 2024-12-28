@@ -4,6 +4,7 @@ type expression =
   | Variable of string
   | Abstraction of string * expression
   | Application of expression * expression
+[@@deriving show]
 
 type env = (string * expression) list
 
@@ -17,6 +18,17 @@ let rec lambda_to_string = function
       Printf.sprintf "(%s)(%s)" (lambda_to_string func)
         (lambda_to_string argument)
 
+let rec beta_reduce (variable : string) (value : expression) = function
+  | Variable var when var = variable -> value
+  | Variable _ as var -> var
+  | Abstraction (param, _) as abs when param = variable -> abs
+  | Abstraction (param, body) ->
+      Abstraction (param, beta_reduce variable value body)
+  | Application (function_, argument) ->
+      Application
+        ( beta_reduce variable value function_,
+          beta_reduce variable value argument )
+
 let rec eval (env : env) = function
   | Variable var as variable -> (
       try List.assoc var env
@@ -28,9 +40,10 @@ let rec eval (env : env) = function
       let function_ = eval env function_ in
       let argument = eval env argument in
       match function_ with
-      | Abstraction (function_, body) ->
-          let new_env = (function_, argument) :: env in
-          eval new_env body
+      | Abstraction (param, body) ->
+          let reduced_body = beta_reduce param argument body in
+          let new_env = (param, reduced_body) :: env in
+          eval new_env reduced_body
       | _ -> failwith "Application of non-function")
 
 let print_lambda lambda result =
