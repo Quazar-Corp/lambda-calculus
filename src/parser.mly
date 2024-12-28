@@ -17,7 +17,7 @@ open Semantic
 program : expr_lst = expression_list; EOF 
   { expr_lst 
     |> List.iter (fun expr -> 
-        expr |> show_expression |> Printf.printf "%s\n";
+        (*expr |> show_expression |> Printf.printf "%s\n";*)
         print_lambda expr (expr |> eval [])) }
 
 variable : var  = VAR { Variable var }
