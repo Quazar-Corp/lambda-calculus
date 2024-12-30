@@ -4,7 +4,7 @@ type expression =
   | Variable of string
   | Abstraction of string * expression
   | Application of expression * expression
-[@@deriving show]
+[@@deriving show, eq]
 
 type env = (string * expression) list
 
