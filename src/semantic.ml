@@ -6,17 +6,17 @@ type expression =
   | Application of expression * expression
 [@@deriving show, eq]
 
-type env = (string * expression) list
+type context = (string * expression) list
 
-let rec lambda_to_string = function
+let rec expression_to_string = function
   | Variable var -> var
   | Abstraction (param, body) ->
-      Printf.sprintf "λ%s -> %s" param (lambda_to_string body)
+      Printf.sprintf "λ%s -> %s" param (expression_to_string body)
   | Application (func, Variable argument) ->
-      Printf.sprintf "(%s)%s" (func |> lambda_to_string) argument
+      Printf.sprintf "(%s)%s" (func |> expression_to_string) argument
   | Application (func, argument) ->
-      Printf.sprintf "(%s)(%s)" (lambda_to_string func)
-        (lambda_to_string argument)
+      Printf.sprintf "(%s)(%s)" (expression_to_string func)
+        (expression_to_string argument)
 
 let rec beta_reduce (variable : string) (value : expression) = function
   | Variable var when var = variable -> value
@@ -29,7 +29,7 @@ let rec beta_reduce (variable : string) (value : expression) = function
         ( beta_reduce variable value function_,
           beta_reduce variable value argument )
 
-let rec eval (env : env) = function
+let rec eval (env : context) = function
   | Variable var as variable -> (
       try List.assoc var env
       with _ ->
@@ -46,7 +46,7 @@ let rec eval (env : env) = function
           eval new_env reduced_body
       | _ -> failwith "Application of non-function")
 
-let print_lambda lambda result =
-  let showable_lambda = lambda |> lambda_to_string in
-  let showable_result = result |> lambda_to_string in
+let print_expression lambda result =
+  let showable_lambda = lambda |> expression_to_string in
+  let showable_result = result |> expression_to_string in
   Printf.printf "Full lambda : %s\nResult: %s\n" showable_lambda showable_result
