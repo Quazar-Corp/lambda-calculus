@@ -4,8 +4,8 @@ module Semantic_test = struct
   module Setup = struct
     open Semantic
 
-    let expression_formatter ppf lambda =
-      Format.fprintf ppf "%s" (Semantic.lambda_to_string lambda)
+    let expression_formatter ppf expression =
+      Format.fprintf ppf "%s" (Semantic.expression_to_string expression)
 
     let expression_testable =
       Alcotest.testable expression_formatter Semantic.equal_expression
