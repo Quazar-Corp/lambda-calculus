@@ -1,19 +1,9 @@
 (library
  (name frontend)
  (libraries str menhirLib)
- (modules
-  (:standard \ Main))
  (preprocess
   (pps ppx_deriving.show ppx_deriving.eq sedlex.ppx)))
 
 (menhir
  (modules parser)
  (flags --dump --explain --table))
-
-(executable
- (name main)
- (public_name interpreter)
- (modules Main)
- (libraries frontend core)
- (preprocess
-  (pps ppx_deriving.show)))

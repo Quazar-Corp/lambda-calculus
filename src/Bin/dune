@@ -1,0 +1,7 @@
+(executable
+ (name main)
+ (public_name interpreter)
+ (modules Main)
+ (libraries frontend core)
+ (preprocess
+  (pps ppx_deriving.show)))
