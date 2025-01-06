@@ -1,7 +1,0 @@
-(executable
- (name main)
- (public_name suite)
- (modules Main)
- (libraries frontend core alcotest)
- (preprocess
-  (pps ppx_deriving.show)))
